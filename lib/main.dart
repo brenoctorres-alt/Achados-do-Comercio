@@ -280,13 +280,48 @@ class _FeedOfertasTabState extends State<FeedOfertasTab> {
   String _filtroTexto = '';
   String _categoriaSelecionada = 'Todas';
 
-  final List<String> _categorias = [
+  static const List<String> _categorias = [
     'Todas',
     'Roupas',
     'Calçados',
     'Eletrônicos',
+    'Informática',
+    'Casa',
+    'Beleza',
+    'Móveis',
     'Utilidades',
   ];
+
+  static const List<String> _categoriasHome = [
+    'Roupas',
+    'Calçados',
+    'Eletrônicos',
+    'Informática',
+    'Casa',
+    'Beleza',
+    'Móveis',
+    'Mais',
+  ];
+
+  static const Map<String, IconData> _iconesCategorias = {
+    'Roupas': Icons.checkroom_outlined,
+    'Calçados': Icons.directions_walk,
+    'Eletrônicos': Icons.devices_other,
+    'Informática': Icons.computer_outlined,
+    'Casa': Icons.home_outlined,
+    'Beleza': Icons.face_retouching_natural,
+    'Móveis': Icons.chair_alt_outlined,
+    'Mais': Icons.grid_view_rounded,
+  };
+
+  void _selecionarCategoria(String categoria) {
+    if (categoria == 'Mais') {
+      _abrirFiltros();
+      return;
+    }
+
+    setState(() => _categoriaSelecionada = categoria);
+  }
 
   void _abrirFiltros() {
     showModalBottomSheet<void>(
@@ -572,24 +607,88 @@ class _FeedOfertasTabState extends State<FeedOfertasTab> {
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 2, 16, 10),
+            child: Row(
+              children: [
+                Text(
+                  'Categorias',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+          ),
           SizedBox(
-            height: 40,
-            child: ListView.builder(
+            height: 88,
+            child: ListView.separated(
+              key: const ValueKey('home-categories'),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               scrollDirection: Axis.horizontal,
-              itemCount: _categorias.length,
+              itemCount: _categoriasHome.length,
+              separatorBuilder: (context, index) =>
+                  const SizedBox(width: 8),
               itemBuilder: (context, index) {
-                final cat = _categorias[index];
-                final selecionada = cat == _categoriaSelecionada;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  child: FilterChip(
-                    label: Text(cat),
+                final categoria = _categoriasHome[index];
+                final categoriaExtra =
+                    !_categoriasHome
+                        .where((item) => item != 'Mais')
+                        .contains(_categoriaSelecionada) &&
+                    _categoriaSelecionada != 'Todas';
+                final selecionada = categoria == 'Mais'
+                    ? categoriaExtra
+                    : categoria == _categoriaSelecionada;
+
+                return SizedBox(
+                  width: 72,
+                  child: Semantics(
+                    button: true,
                     selected: selecionada,
-                    onSelected: (bool value) {
-                      setState(() {
-                        _categoriaSelecionada = cat;
-                      });
-                    },
+                    label: categoria,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: () => _selecionarCategoria(categoria),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            width: 52,
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: selecionada
+                                  ? AppColors.green
+                                  : AppColors.background,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _iconesCategorias[categoria],
+                              color: selecionada
+                                  ? AppColors.white
+                                  : AppColors.primary,
+                              size: 23,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            categoria,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: selecionada
+                                  ? AppColors.green
+                                  : AppColors.primary,
+                              fontSize: 11,
+                              fontWeight: selecionada
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               },

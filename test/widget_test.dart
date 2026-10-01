@@ -25,6 +25,28 @@ void main() {
     expect(find.text('Feira de Santana'), findsOneWidget);
     expect(find.text('Busque produtos, lojas ou categorias...'), findsOneWidget);
     expect(find.byTooltip('Notificações'), findsOneWidget);
+    expect(find.text('Categorias'), findsOneWidget);
+
+    final categoryList =
+        tester.widget<ListView>(find.byKey(const ValueKey('home-categories')));
+    expect(categoryList.scrollDirection, Axis.horizontal);
+    for (final category in [
+      'Roupas',
+      'Calçados',
+      'Eletrônicos',
+      'Informática',
+      'Casa',
+      'Beleza',
+      'Móveis',
+      'Mais',
+    ]) {
+      expect(find.text(category), findsOneWidget);
+    }
+
+    await tester.tap(find.text('Calçados'));
+    await tester.pumpAndSettle();
+    expect(find.text('Tênis Esportivo Corrida Tam 40'), findsOneWidget);
+    expect(find.text('Jaqueta Jeans Masculina G'), findsNothing);
 
     await tester.tap(find.byTooltip('Filtros'));
     await tester.pumpAndSettle();
