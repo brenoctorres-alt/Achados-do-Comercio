@@ -11,6 +11,8 @@ class AppColors {
   static const orange = Color(0xFFF47B20);
   static const white = Color(0xFFFFFFFF);
   static const textSecondary = Color(0xFF64748B);
+  static const headerSurface = Color(0x1AFFFFFF);
+  static const headerDetail = Color(0x66FFFFFF);
 }
 
 void main() {
@@ -286,6 +288,48 @@ class _FeedOfertasTabState extends State<FeedOfertasTab> {
     'Utilidades',
   ];
 
+  void _abrirFiltros() {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      backgroundColor: AppColors.white,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Filtrar por categoria',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _categorias.map((categoria) {
+                  return ChoiceChip(
+                    label: Text(categoria),
+                    selected: categoria == _categoriaSelecionada,
+                    selectedColor: AppColors.lightGreen,
+                    onSelected: (_) {
+                      setState(() => _categoriaSelecionada = categoria);
+                      Navigator.of(sheetContext).pop();
+                    },
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ofertasFiltradas = widget.ofertas.where((oferta) {
@@ -299,39 +343,233 @@ class _FeedOfertasTabState extends State<FeedOfertasTab> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Achados do Comércio',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: AppColors.white,
-              ),
-            ),
-            Text(
-              'Encontre. Compare. Compre local.',
-              style: TextStyle(fontSize: 11, color: AppColors.white),
-            ),
-          ],
-        ),
-      ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: TextField(
-              onChanged: (val) => setState(() => _filtroTexto = val),
-              decoration: InputDecoration(
-                hintText: 'Buscar produtos ou lojas na cidade...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                filled: true,
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(24),
               ),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            color: AppColors.green,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              const Icon(
+                                Icons.shopping_bag_outlined,
+                                color: AppColors.white,
+                                size: 26,
+                              ),
+                              Positioned(
+                                right: 3,
+                                bottom: 3,
+                                child: Icon(
+                                  Icons.location_on,
+                                  color: AppColors.orange,
+                                  size: 15,
+                                  shadows: [
+                                    Shadow(
+                                      color: AppColors.primary,
+                                      blurRadius: 3,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Achados do Comércio',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 3),
+                              Text(
+                                'Encontre. Compare. Compre local.',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: AppColors.headerDetail,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Notificações',
+                          onPressed: () {},
+                          color: AppColors.white,
+                          icon: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              const Icon(Icons.notifications_none_rounded),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                  width: 7,
+                                  height: 7,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.orange,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.headerSurface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.headerDetail),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on_outlined,
+                            color: AppColors.green,
+                            size: 21,
+                          ),
+                          const SizedBox(width: 9),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'SUA LOCALIZAÇÃO',
+                                  style: TextStyle(
+                                    color: AppColors.headerDetail,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Feira de Santana',
+                                  style: TextStyle(
+                                    color: AppColors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.location_city_outlined,
+                            color: AppColors.headerDetail,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 7),
+                          const Icon(
+                            Icons.storefront_outlined,
+                            color: AppColors.headerDetail,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 5),
+                          const Icon(
+                            Icons.expand_more,
+                            color: AppColors.white,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 56,
+                    child: TextField(
+                      onChanged: (val) => setState(() => _filtroTexto = val),
+                      textInputAction: TextInputAction.search,
+                      decoration: InputDecoration(
+                        hintText: 'Busque produtos, lojas ou categorias...',
+                        hintStyle: const TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 14,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search_rounded,
+                          color: AppColors.primary,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                  width: 56,
+                  height: 56,
+                  child: IconButton.filledTonal(
+                    tooltip: 'Filtros',
+                    onPressed: _abrirFiltros,
+                    style: IconButton.styleFrom(
+                      backgroundColor: AppColors.lightGreen,
+                      foregroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    icon: const Icon(Icons.tune_rounded),
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(

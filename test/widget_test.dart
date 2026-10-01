@@ -22,6 +22,14 @@ void main() {
 
     expect(find.text('Achados do Comércio'), findsOneWidget);
     expect(find.text('Encontre. Compare. Compre local.'), findsOneWidget);
+    expect(find.text('Feira de Santana'), findsOneWidget);
+    expect(find.text('Busque produtos, lojas ou categorias...'), findsOneWidget);
+    expect(find.byTooltip('Notificações'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Filtros'));
+    await tester.pumpAndSettle();
+    expect(find.text('Filtrar por categoria'), findsOneWidget);
+    expect(find.text('Eletrônicos'), findsWidgets);
 
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
     expect(app.theme!.colorScheme.primary, const Color(0xFF123C4A));
