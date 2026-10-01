@@ -1,6 +1,17 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+class AppColors {
+  static const primary = Color(0xFF123C4A);
+  static const green = Color(0xFF18A66A);
+  static const lightGreen = Color(0xFFDFF4E9);
+  static const background = Color(0xFFFFF8F0);
+  static const orange = Color(0xFFF47B20);
+  static const white = Color(0xFFFFFFFF);
+  static const textSecondary = Color(0xFF64748B);
+}
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +27,39 @@ class AchadosDoComercioApp extends StatelessWidget {
       title: 'Achados do Comércio',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFFF5722),
-          primary: const Color(0xFFFF5722),
-          secondary: const Color(0xFF2196F3),
+        colorScheme:
+            ColorScheme.fromSeed(
+              seedColor: AppColors.primary,
+              brightness: Brightness.light,
+            ).copyWith(
+              primary: AppColors.primary,
+              onPrimary: AppColors.white,
+              secondary: AppColors.green,
+              onSecondary: AppColors.white,
+              secondaryContainer: AppColors.lightGreen,
+              onSecondaryContainer: AppColors.primary,
+              tertiary: AppColors.orange,
+              onTertiary: AppColors.white,
+              surface: AppColors.white,
+              onSurface: AppColors.primary,
+              onSurfaceVariant: AppColors.textSecondary,
+            ),
+        scaffoldBackgroundColor: AppColors.background,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.white,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          selectedItemColor: AppColors.green,
+          unselectedItemColor: AppColors.textSecondary,
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.white,
+        ),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: AppColors.primary),
+          bodySmall: TextStyle(color: AppColors.textSecondary),
         ),
         useMaterial3: true,
       ),
@@ -91,8 +131,9 @@ class StorageService {
 
   static Future<void> salvarOfertas(List<Oferta> ofertas) async {
     final prefs = await SharedPreferences.getInstance();
-    final List<String> ofertasJson =
-        ofertas.map((o) => jsonEncode(o.toMap())).toList();
+    final List<String> ofertasJson = ofertas
+        .map((o) => jsonEncode(o.toMap()))
+        .toList();
     await prefs.setStringList(_keyOfertas, ofertasJson);
   }
 
@@ -104,9 +145,7 @@ class StorageService {
       return _getOfertasIniciais();
     }
 
-    return ofertasJson
-        .map((item) => Oferta.fromMap(jsonDecode(item)))
-        .toList();
+    return ofertasJson.map((item) => Oferta.fromMap(jsonDecode(item))).toList();
   }
 
   static List<Oferta> _getOfertasIniciais() {
@@ -192,9 +231,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     if (_carregando) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final List<Widget> telas = [
@@ -218,10 +255,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: Icon(Icons.add_circle_outline),
             label: 'Cadastrar',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.store),
-            label: 'Minha Loja',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.store), label: 'Minha Loja'),
         ],
       ),
     );
@@ -249,7 +283,7 @@ class _FeedOfertasTabState extends State<FeedOfertasTab> {
     'Roupas',
     'Calçados',
     'Eletrônicos',
-    'Utilidades'
+    'Utilidades',
   ];
 
   @override
@@ -257,20 +291,32 @@ class _FeedOfertasTabState extends State<FeedOfertasTab> {
     final ofertasFiltradas = widget.ofertas.where((oferta) {
       final bateNome =
           oferta.titulo.toLowerCase().contains(_filtroTexto.toLowerCase()) ||
-              oferta.loja.toLowerCase().contains(_filtroTexto.toLowerCase());
-      final bateCategoria = _categoriaSelecionada == 'Todas' ||
+          oferta.loja.toLowerCase().contains(_filtroTexto.toLowerCase());
+      final bateCategoria =
+          _categoriaSelecionada == 'Todas' ||
           oferta.categoria == _categoriaSelecionada;
       return bateNome && bateCategoria;
     }).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Achados do Comércio 🛍️',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Achados do Comércio',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.white,
+              ),
+            ),
+            Text(
+              'Encontre. Compare. Compre local.',
+              style: TextStyle(fontSize: 11, color: AppColors.white),
+            ),
+          ],
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
@@ -285,7 +331,6 @@ class _FeedOfertasTabState extends State<FeedOfertasTab> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 filled: true,
-                fillColor: Colors.grey[100],
               ),
             ),
           ),
@@ -338,10 +383,11 @@ class ItemCardOferta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final desconto = (((oferta.precoOriginal - oferta.precoPromocional) /
-                oferta.precoOriginal) *
-            100)
-        .round();
+    final desconto =
+        (((oferta.precoOriginal - oferta.precoPromocional) /
+                    oferta.precoOriginal) *
+                100)
+            .round();
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -353,8 +399,9 @@ class ItemCardOferta extends StatelessWidget {
           Stack(
             children: [
               ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
                 child: Image.network(
                   oferta.imagemUrl,
                   height: 160,
@@ -362,7 +409,7 @@ class ItemCardOferta extends StatelessWidget {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
                     height: 160,
-                    color: Colors.grey[300],
+                    color: AppColors.lightGreen,
                     child: const Icon(Icons.store, size: 50),
                   ),
                 ),
@@ -371,16 +418,18 @@ class ItemCardOferta extends StatelessWidget {
                 top: 8,
                 right: 8,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.redAccent,
+                    color: AppColors.orange,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     '-$desconto%',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -403,17 +452,25 @@ class ItemCardOferta extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.storefront, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.storefront,
+                      size: 16,
+                      color: AppColors.textSecondary,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       oferta.loja,
-                      style: const TextStyle(color: Colors.grey),
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                     const Spacer(),
-                    const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.location_on,
+                      size: 16,
+                      color: AppColors.textSecondary,
+                    ),
                     Text(
                       oferta.distancia,
-                      style: const TextStyle(color: Colors.grey),
+                      style: const TextStyle(color: AppColors.textSecondary),
                     ),
                   ],
                 ),
@@ -427,7 +484,7 @@ class ItemCardOferta extends StatelessWidget {
                           'De: R\$ ${oferta.precoOriginal.toStringAsFixed(2)}',
                           style: const TextStyle(
                             decoration: TextDecoration.lineThrough,
-                            color: Colors.grey,
+                            color: AppColors.textSecondary,
                             fontSize: 12,
                           ),
                         ),
@@ -455,8 +512,8 @@ class ItemCardOferta extends StatelessWidget {
                       icon: const Icon(Icons.chat_bubble_outline),
                       label: const Text('Tenho Interesse'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.green,
+                        foregroundColor: AppColors.white,
                       ),
                     ),
                   ],
@@ -495,7 +552,7 @@ class _CadastroOfertaTabState extends State<CadastroOfertaTab> {
     'Roupas',
     'Calçados',
     'Eletrônicos',
-    'Utilidades'
+    'Utilidades',
   ];
 
   void _submeterFormulario() {
@@ -526,11 +583,7 @@ class _CadastroOfertaTabState extends State<CadastroOfertaTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cadastrar Novo Achado'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ),
+      appBar: AppBar(title: const Text('Cadastrar Novo Achado')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -568,9 +621,8 @@ class _CadastroOfertaTabState extends State<CadastroOfertaTab> {
                         labelText: 'Preço Original (R\$)',
                         border: OutlineInputBorder(),
                       ),
-                      validator: (value) => value == null || value.isEmpty
-                          ? 'Obrigatório'
-                          : null,
+                      validator: (value) =>
+                          value == null || value.isEmpty ? 'Obrigatório' : null,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -582,9 +634,8 @@ class _CadastroOfertaTabState extends State<CadastroOfertaTab> {
                         labelText: 'Preço Com Desconto (R\$)',
                         border: OutlineInputBorder(),
                       ),
-                      validator: (value) => value == null || value.isEmpty
-                          ? 'Obrigatório'
-                          : null,
+                      validator: (value) =>
+                          value == null || value.isEmpty ? 'Obrigatório' : null,
                     ),
                   ),
                 ],
@@ -597,8 +648,9 @@ class _CadastroOfertaTabState extends State<CadastroOfertaTab> {
                   border: OutlineInputBorder(),
                 ),
                 items: _categorias
-                    .map((cat) =>
-                        DropdownMenuItem(value: cat, child: Text(cat)))
+                    .map(
+                      (cat) => DropdownMenuItem(value: cat, child: Text(cat)),
+                    )
                     .toList(),
                 onChanged: (val) {
                   if (val != null) {
@@ -627,7 +679,7 @@ class _CadastroOfertaTabState extends State<CadastroOfertaTab> {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AppColors.white,
                 ),
               ),
             ],
@@ -647,11 +699,7 @@ class PerfilTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Minha Loja'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-      ),
+      appBar: AppBar(title: const Text('Minha Loja')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -667,7 +715,7 @@ class PerfilTab extends StatelessWidget {
             ),
             const Text(
               'Feira de Santana - BA',
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: AppColors.textSecondary),
             ),
             const Divider(height: 32),
             ListTile(
